@@ -37,14 +37,28 @@
 
   function startTimer (slideshow, time) {
     var timeInMs = time * 1000;
-    var advanceFunc = advance.bind(null, slideshow);
-    window.setInterval(function () {
+
+    // The advance funtion updates the display, and then schedules the next
+    // call to advance the slide:
+    function advanceSlideshow () {
+      advance(slideshow);
+      window.setTimeout(doAdvance, timeInMs);
+    }
+
+    // We wrap the call to advance the slide in requestAnimationFrame, because
+    // this doesn't get called until the window is in view (meaning the animation
+    // doesn't needlessly run when offscreen). Not all browsers have it though,
+    // so there's a little fallback just in case:
+    function doAdvance () {
       if (window.requestAnimationFrame) {
-        window.requestAnimationFrame(advanceFunc);
+        window.requestAnimationFrame(advanceSlideshow);
       } else {
-        advanceFunc();
+        advanceSlideshow();
       }
-    }, timeInMs);
+    }
+
+    // Schedule the first `doAdvance`, which will call itself thereafter
+    window.setTimeout(doAdvance, timeInMs);
   }
 
   init();
