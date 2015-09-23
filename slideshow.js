@@ -37,8 +37,13 @@
 
   function startTimer (slideshow, time) {
     var timeInMs = time * 1000;
+    var advanceFunc = advance.bind(null, slideshow);
     window.setInterval(function () {
-      window.requestAnimationFrame(advance.bind(null, slideshow));
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(advanceFunc);
+      } else {
+        advanceFunc();
+      }
     }, timeInMs);
   }
 
